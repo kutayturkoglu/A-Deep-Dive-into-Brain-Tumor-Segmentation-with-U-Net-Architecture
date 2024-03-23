@@ -5,14 +5,17 @@ import torch
 class DiceLoss(nn.Module):
     def __init__(self):
         super(DiceLoss, self).__init__()
+        self.smooth = 1.0
 
     def forward(self, input, target):
-        inputs = torch.sigmoid(input)
-        smooth = 1.0
-        inputs = inputs.reshape(-1)
-        tar = target.reshape(-1)
-        intersection = (inputs*tar).sum()
+        input = torch.sigmoid(input)
 
-        dic_loss = 1-((2.0*intersection+smooth)/(inputs.sum()+tar.sum()+smooth))
+        intersection = torch.sum(input * target)
+        union = torch.sum(input) + torch.sum(target)
 
-        return dic_loss
+        dice_coeff = (2.0 * intersection + self.smooth) / (union + self.smooth)
+
+        dice_loss = 1.0 - dice_coeff
+
+        return dice_loss
+
