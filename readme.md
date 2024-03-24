@@ -5,8 +5,12 @@ This project focuses on segmenting brain tumors from medical images using semant
 ## Table of Contents
 
 - [Description](#description)
-- [Generative Adversarial Networks (GANs)](#generative-adversarial-networks-gans)
-- [Training Pseudocode](#training-pseudocode)
+- [U-Net Architecture](#u-net-architecture)
+  - [Architecture Overview](#architecture-overview)
+  - [Benefits of U-Net](#benefits-of-u-net)
+- [Dice Loss](#dice-loss)
+  - [Issue with Dice Loss in this Project](#issue-with-dice-loss-in-this-project)
+- [Evaluation](#evaluation)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
@@ -66,7 +70,6 @@ Evaluation of the segmentation results can be done using various metrics, includ
 - Optionally, adjust hyperparameters and configurations as needed.
 - You can also use `pip install segmentation-models-pytorch` to install the pretrained models. Here is a link to the documentation: [Segmentation Models PyTorch Documentation](https://segmentation-modelspytorch.readthedocs.io/en/latest/). You can use the backbones provided in the documentation as you wish.
 
-
 ## Contributing
 
 Contributions are welcome! Please reach me out for any possible contributions.
@@ -98,4 +101,3 @@ The format in [text](_annotations.coco.json) is in rectangular format, which mak
 ![Example Output](imgs/example_output.png)
 
 As far as it can be observed above, the mask area exceeds the tumor are, but the model has guessed the tumors borders very fine. If you will do any kind of preprocessing, please keep that in mind.
-
