@@ -28,4 +28,3 @@ def valid(model,loader,loss_fn,device):
         loss = loss_fn(pred,y)
         epoch_loss +=loss.item()
     return epoch_loss/len(loader)
-

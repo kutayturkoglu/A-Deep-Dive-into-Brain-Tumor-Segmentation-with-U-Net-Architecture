@@ -4,7 +4,9 @@ import os
 import numpy as np
 import tifffile as tiff
 import json
+import torch
 import shutil
+from torchvision import transforms
 
 def plot_data(image_names, annotations):
     fig , ax = plt.subplots(1,2,figsize = (10,10))
@@ -81,3 +83,47 @@ def compare_folders(folder1, folder2):
         file_path = os.path.join(folder2, file_name)
         os.remove(file_path)
         print(f"Deleted file: {file_path}")
+
+def visualize_model_output(test_loader, device, model):
+    # Assuming your test dataset is named test_dataset and you have a DataLoader named test_loader
+    # Iterate over the test dataset and visualize the mask vs predicted
+    batch_count = 0  # Counter for batches
+    with torch.no_grad():
+        for images, masks in test_loader:
+            images = images.to(device)
+            masks = masks.to(device)
+            
+            # Forward pass
+            predicted_masks = model(images)
+            
+            # Convert tensors to numpy arrays
+            images_np = images.cpu().numpy()
+            masks_np = masks.cpu().numpy()
+            predicted_masks_np = predicted_masks.cpu().numpy()
+            
+            # Visualize a sample from the batch
+            for i in range(images_np.shape[0]):
+                plt.figure(figsize=(18, 6))
+                
+                # Plot original image
+                plt.subplot(1, 3, 1)
+                plt.imshow(transforms.ToPILImage()(images_np[i].transpose(1, 2, 0)), cmap='gray')
+                plt.title('Original Image')
+                plt.axis('off')
+                
+                # Plot true mask
+                plt.subplot(1, 3, 2)
+                plt.imshow(masks_np[i][0], cmap='gray')
+                plt.title('True Mask')
+                plt.axis('off')
+                
+                # Plot predicted mask overlaid on the true mask
+                plt.subplot(1, 3, 3)
+                plt.imshow(masks_np[i][0], cmap='gray')
+                plt.imshow(predicted_masks_np[i][0], alpha=0.5, cmap='gray', interpolation='none')
+                plt.title('Predicted Mask Overlay')
+                plt.axis('off')
+                        
+            batch_count += 1
+            if batch_count == 2:  # Break after the second batch
+                break
