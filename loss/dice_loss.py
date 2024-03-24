@@ -18,4 +18,3 @@ class DiceLoss(nn.Module):
         dice_loss = 1.0 - dice_coeff
 
         return dice_loss
-
