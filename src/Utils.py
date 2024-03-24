@@ -9,6 +9,13 @@ import shutil
 from torchvision import transforms
 
 def plot_data(image_names, annotations):
+    """
+        Plots images with bounding boxes based on provided annotations.
+
+        Parameters:
+        - image_names (list): List of image file paths.
+        - annotations (dict): Annotations data in COCO format.
+    """
     fig , ax = plt.subplots(1,2,figsize = (10,10))
     for i, img_name in enumerate(image_names):
         # We can use cv2 to read the image
@@ -28,6 +35,15 @@ def plot_data(image_names, annotations):
     plt.show()
 
 def create_mask(json_file, mask_output_folder, image_output_folder, original_image_dir):
+    """
+        Creates masks for images based on annotations and saves them to specified folders.
+
+        Parameters:
+        - json_file (str): Path to the JSON file containing annotations.
+        - mask_output_folder (str): Path to the folder where masks will be saved.
+        - image_output_folder (str): Path to the folder where images will be saved.
+        - original_image_dir (str): Path to the folder containing original images.
+    """
 
     with open(json_file) as f:
         data = json.load(f)
@@ -53,6 +69,13 @@ def create_mask(json_file, mask_output_folder, image_output_folder, original_ima
         shutil.copy(original_image_path, new_image_path)
 
 def plot_mask(mask_dir, image_dir):
+    """
+        Plots masks alongside original images.
+
+        Parameters:
+        - mask_dir (str): Path to the folder containing masks.
+        - image_dir (str): Path to the folder containing original images.
+    """
     mask_files = os.listdir(mask_dir)
     image_files = os.listdir(image_dir)
     for i, mask_file in enumerate(mask_files):
@@ -69,6 +92,13 @@ def plot_mask(mask_dir, image_dir):
         break
 
 def compare_folders(folder1, folder2):
+    """
+        Compares files in two folders and removes any files not present in both.
+
+        Parameters:
+        - folder1 (str): Path to the first folder.
+        - folder2 (str): Path to the second folder.
+    """
     files1 = os.listdir(folder1)
     files2 = os.listdir(folder2)
 
@@ -85,39 +115,39 @@ def compare_folders(folder1, folder2):
         print(f"Deleted file: {file_path}")
 
 def visualize_model_output(test_loader, device, model):
-    # Assuming your test dataset is named test_dataset and you have a DataLoader named test_loader
-    # Iterate over the test dataset and visualize the mask vs predicted
-    batch_count = 0  # Counter for batches
+    """
+        Visualizes model predictions on test dataset.
+
+        Parameters:
+        - test_loader (DataLoader): DataLoader for the test dataset.
+        - device (str): Device to run the model on (e.g., 'cpu', 'cuda').
+        - model (torch.nn.Module): Trained model.
+    """
+    batch_count = 0  
     with torch.no_grad():
         for images, masks in test_loader:
             images = images.to(device)
             masks = masks.to(device)
             
-            # Forward pass
             predicted_masks = model(images)
             
-            # Convert tensors to numpy arrays
             images_np = images.cpu().numpy()
             masks_np = masks.cpu().numpy()
             predicted_masks_np = predicted_masks.cpu().numpy()
             
-            # Visualize a sample from the batch
             for i in range(images_np.shape[0]):
                 plt.figure(figsize=(18, 6))
                 
-                # Plot original image
                 plt.subplot(1, 3, 1)
                 plt.imshow(transforms.ToPILImage()(images_np[i].transpose(1, 2, 0)), cmap='gray')
                 plt.title('Original Image')
                 plt.axis('off')
                 
-                # Plot true mask
                 plt.subplot(1, 3, 2)
                 plt.imshow(masks_np[i][0], cmap='gray')
                 plt.title('True Mask')
                 plt.axis('off')
                 
-                # Plot predicted mask overlaid on the true mask
                 plt.subplot(1, 3, 3)
                 plt.imshow(masks_np[i][0], cmap='gray')
                 plt.imshow(predicted_masks_np[i][0], alpha=0.5, cmap='gray', interpolation='none')
@@ -125,5 +155,5 @@ def visualize_model_output(test_loader, device, model):
                 plt.axis('off')
                         
             batch_count += 1
-            if batch_count == 2:  # Break after the second batch
+            if batch_count == 2: 
                 break
